@@ -138,8 +138,12 @@ def evaluate_model(model, tokenizer, X_test, y_test):
     accuracy = np.mean(y_pred_classes == y_true_classes)
 
     # Compute perplexity
-    loss = model.evaluate(X_test, y_test, verbose=0)
-    perplexity = np.exp(loss[0]) if isinstance(loss, list) else np.exp(loss)
+    def calculate_perplexity(model, X):
+        preds = model.predict(X)
+        log_likelihood = -np.log(np.max(preds, axis=1))
+        perplexity = np.exp(np.mean(log_likelihood))
+        return perplexity
+    perplexity = calculate_perplexity(model, X_test)
 
     # Generate classification report
     report = classification_report(y_true_classes, y_pred_classes, output_dict=True)
